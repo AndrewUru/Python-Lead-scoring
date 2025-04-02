@@ -1,6 +1,6 @@
+pandas
 streamlit
 openai
-pandas
 python-dotenv
 matplotlib
 seaborn
