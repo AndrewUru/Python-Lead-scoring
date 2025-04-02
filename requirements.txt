@@ -1,6 +1,7 @@
 pandas
+openpyxl
 streamlit
 openai
-python-dotenv
 matplotlib
 seaborn
+
