@@ -86,16 +86,11 @@ Solo responde con un número del 1 al 5.
                 return "Otro"
 
         with st.spinner("Analizando leads..."):
-            df["lead_score"] = df.apply(
-                lambda row: obtener_score(row["mensaje"], row["empresa"], row["tamaño_empresa"]),
-                axis=1
-            )
-            df["categoría"] = df["lead_score"].apply(categorizar)
-            df["necesidad"] = df["mensaje"].apply(clasificar_necesidad)
-
-        st.success("✅ Análisis completado")
-        st.dataframe(df, use_container_width=True)
-
+                df["lead_score"] = df.apply(
+                    lambda row: obtener_score(row["mensaje"], row["empresa"], row["tamaño_empresa"]),
+                    axis=1
+                )
+    
         def categorizar(score):
                 if score >= 4:
                     return "🟢 Caliente"
@@ -105,6 +100,12 @@ Solo responde con un número del 1 al 5.
                     return "🔴 Frío"
                 else:
                     return "❓"
+    
+                df["categoría"] = df["lead_score"].apply(categorizar)
+                df["necesidad"] = df["mensaje"].apply(clasificar_necesidad)
+
+        st.success("✅ Análisis completado")
+        st.dataframe(df, use_container_width=True)
 
         # Exportar
         csv = df.to_csv(index=False).encode('utf-8')
