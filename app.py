@@ -74,16 +74,6 @@ Solo responde con un número del 1 al 5.
             except:
                 return None
 
-        def categorizar(score):
-            if score >= 4:
-                return "🟢 Caliente"
-            elif score == 3:
-                return "🟡 Tibio"
-            elif score <= 2:
-                return "🔴 Frío"
-            else:
-                return "❓"
-
         def clasificar_necesidad(mensaje):
             mensaje = mensaje.lower()
             if "tienda" in mensaje or "ecommerce" in mensaje:
@@ -105,6 +95,16 @@ Solo responde con un número del 1 al 5.
 
         st.success("✅ Análisis completado")
         st.dataframe(df, use_container_width=True)
+
+                def categorizar(score):
+            if score >= 4:
+                return "🟢 Caliente"
+            elif score == 3:
+                return "🟡 Tibio"
+            elif score <= 2:
+                return "🔴 Frío"
+            else:
+                return "❓"
 
         # Exportar
         csv = df.to_csv(index=False).encode('utf-8')
