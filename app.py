@@ -118,11 +118,12 @@ Solo responde con un número del 1 al 5.
         # Análisis con spinner
         with st.spinner("Analizando leads..."):
             df["lead_score"] = df.apply(
-                lambda row: obtener_score(row["mensaje"], row["empresa"], row["tamaño_empresa"]),
+                lambda row: obtener_score(row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
                 axis=1
             )
             df["categoría"] = df["lead_score"].apply(categorizar)
-            df["necesidad"] = df["mensaje"].apply(clasificar_necesidad)
+            df["necesidad"] = df[col_mensaje].apply(clasificar_necesidad)
+
 
         st.success("✅ Análisis completado")
         st.dataframe(df, use_container_width=True)
