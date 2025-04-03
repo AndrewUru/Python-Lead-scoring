@@ -110,8 +110,8 @@ Responde solo con el nombre de la categoría detectada.
             )
             return response.choices[0].message.content.strip()
         except Exception as e:
-            st.warning(f"⚠️ Error detectando necesidad: '{mensaje[:40]}...'
-{e}")
+            st.warning(f"⚠️ Error detectando necesidad: \"{mensaje[:40]}...\"")
+
             return "Desconocido"
 
     if st.button("✨ Analizar Leads"):
