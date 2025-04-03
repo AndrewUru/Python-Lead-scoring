@@ -12,6 +12,55 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 st.set_page_config(page_title="Lead Scoring", layout="wide")
 st.title("🔍 Lead Scoring App con IA")
 
+# Markdown con estilo moderno mejorado
+st.markdown("""
+<style>
+.intro-box {
+    background-color: #1E1E1E;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #333;
+}
+.intro-box h3 {
+    color: #4FC3F7;
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin-top: 0;
+}
+.intro-box ul {
+    padding-left: 1.5rem;
+    line-height: 1.6;
+}
+</style>
+
+<div class="intro-box">
+<h3>🧠 ¿Qué hace esta app?</h3>
+
+Esta herramienta analiza leads (clientes potenciales) utilizando <strong>inteligencia artificial</strong> para predecir su intención de contratar servicios digitales.
+
+Evalúa cada mensaje teniendo en cuenta:
+<ul>
+  <li>💬 El contenido del mensaje del cliente</li>
+  <li>🏢 El tipo de empresa</li>
+  <li>📊 El tamaño de la empresa</li>
+</ul>
+
+<hr/>
+
+<h3>👥 Ideal para:</h3>
+<ul>
+  <li>📈 Agencias de marketing digital</li>
+  <li>🧑‍💻 Freelancers que ofrecen servicios web o redes sociales</li>
+  <li>🏢 Equipos comerciales que gestionan grandes listas de contactos</li>
+</ul>
+
+<hr/>
+
+⚡ Pulsa en <strong>“Analizar Leads”</strong> para obtener una puntuación de intención de contratación (Lead Score) del 1 al 5, junto con su categoría: <strong>Frío, Tibio o Caliente</strong>.
+</div>
+""", unsafe_allow_html=True)
+
 # Sidebar
 with st.sidebar:
     st.image("logo.png", width=150)
@@ -22,6 +71,8 @@ with st.sidebar:
     st.markdown("📈 Ver resultados")
     st.markdown("---")
     st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
+
+    
 
 # Descarga de ejemplo
 with open("leads.csv", "rb") as file:
