@@ -67,11 +67,6 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
     st.dataframe(df, use_container_width=True)
 
-    # Validación de columnas necesarias
-    if not all(col in df.columns for col in ["mensaje", "empresa", "tamaño_empresa"]):
-        st.error("❌ El CSV debe tener las columnas: mensaje, empresa y tamaño_empresa.")
-        st.stop()
-
     if st.button("✨ Analizar Leads"):
 
         def obtener_score(mensaje, empresa, tamaño_empresa):
