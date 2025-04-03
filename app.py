@@ -110,8 +110,7 @@ Responde solo con el nombre de la categoría detectada.
             )
             return response.choices[0].message.content.strip()
         except Exception as e:
-            st.warning(f"⚠️ Error detectando necesidad: \"{mensaje[:40]}...\"")
-
+            st.warning(f"⚠️ Error detectando necesidad: '{mensaje[:40]}...'")
             return "Desconocido"
 
     if st.button("✨ Analizar Leads"):
@@ -143,8 +142,7 @@ Responde solo con el número (1-5), seguido de dos puntos y una breve explicaci�
                 score_str, *justificación = respuesta.split(":", 1)
                 return int(score_str.strip())
             except Exception as e:
-                st.warning(f"⚠️ Error al analizar: '{mensaje[:40]}...'
-{e}")
+                st.warning(f"⚠️ Error al analizar: '{mensaje[:40]}...'")
                 return None
 
         def categorizar(score):
