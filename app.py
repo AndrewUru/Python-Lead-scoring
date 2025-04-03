@@ -4,15 +4,25 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
+# Carga de variables de entorno
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+api_key = os.getenv("OPENAI_API_KEY")
 
+# Validación de la API Key
+if not api_key:
+    st.error("❌ No se encontró la clave de API de OpenAI. Verifica tu archivo `.env` o los secretos en Streamlit Cloud.")
+    st.stop()
+
+# Cliente de OpenAI
+client = OpenAI(api_key=api_key)
+
+# Configuración de la página
 st.set_page_config(page_title="Lead Scoring", layout="wide")
 st.title("🔍 Análisis de Leads con IA")
 
+# Sidebar
 with st.sidebar:
     st.image("logo.png", width=150)
-
     st.title("📊 Lead Scoring App")
     st.markdown("---")
     st.markdown("📁 Subir archivo CSV")
@@ -21,38 +31,36 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
 
-
+# Explicación
 st.markdown("""
 ### 🧠 ¿Qué hace esta app?
 
-Esta herramienta analiza leads (clientes potenciales) usando inteligencia artificial.  
-Evalúa el nivel de intención de compra de cada lead en base a su mensaje, el tipo de empresa y su tamaño.
+Esta herramienta analiza leads usando IA para predecir su intención de contratar.
 
 Ideal para:
 
 - Agencias de marketing digital
-- Freelancers que ofrecen servicios web o en redes sociales
-- Empresas que quieren priorizar contactos
+- Freelancers web
+- Equipos de ventas
 
 ---
-
-### 📥 Descarga un archivo de ejemplo
-
-Puedes usar este archivo CSV para probar la app rápidamente.
 """)
 
+# Descarga de ejemplo
 with open("leads.csv", "rb") as file:
     st.download_button("⬇️ Descargar CSV de ejemplo", file, "leads.csv", "text/csv")
 
-
-# ... (tu encabezado y barra lateral se mantiene igual)
-
-# Subir archivo
+# Subida de archivo
 uploaded_file = st.file_uploader("📤 Sube tu archivo CSV de leads", type="csv")
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
     st.dataframe(df, use_container_width=True)
+
+    # Validación de columnas necesarias
+    if not all(col in df.columns for col in ["mensaje", "empresa", "tamaño_empresa"]):
+        st.error("❌ El CSV debe tener las columnas: mensaje, empresa y tamaño_empresa.")
+        st.stop()
 
     if st.button("✨ Analizar Leads"):
 
@@ -76,7 +84,7 @@ Solo responde con un número del 1 al 5.
                 score = response.choices[0].message.content.strip()
                 return int(score)
             except Exception as e:
-                print(f"❌ Error con lead: {mensaje}\n{e}")
+                st.warning(f"⚠️ Error al analizar: '{mensaje[:40]}...'\n{e}")
                 return None
 
         def clasificar_necesidad(mensaje):
@@ -100,6 +108,7 @@ Solo responde con un número del 1 al 5.
             else:
                 return "🔴 Frío"
 
+        # Análisis con spinner
         with st.spinner("Analizando leads..."):
             df["lead_score"] = df.apply(
                 lambda row: obtener_score(row["mensaje"], row["empresa"], row["tamaño_empresa"]),
@@ -111,17 +120,16 @@ Solo responde con un número del 1 al 5.
         st.success("✅ Análisis completado")
         st.dataframe(df, use_container_width=True)
 
-        # Exportar
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
+        # Exportar resultados
+        with st.spinner("Generando archivos para descargar..."):
+            csv = df.to_csv(index=False).encode('utf-8')
+            st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
 
-        df.to_excel("leads_analizados.xlsx", index=False)
-        with open("leads_analizados.xlsx", "rb") as f:
-            st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
+            df.to_excel("leads_analizados.xlsx", index=False)
+            with open("leads_analizados.xlsx", "rb") as f:
+                st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
 
-        st.markdown("""
-<hr style="border:1px solid #ccc">
-<center>
-    Hecho con ❤️ por [Andrés Tobío](https://elsaltoweb.es) · Powered by OpenAI & Streamlit
-</center>
-""", unsafe_allow_html=True)
+        st.markdown("""<hr style="border:1px solid #ccc">
+        <center>
+            Hecho con ❤️ por <a href="https://elsaltoweb.es" target="_blank">Andrés Tobío</a> · Powered by OpenAI & Streamlit
+        </center>""", unsafe_allow_html=True)
