@@ -4,21 +4,13 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
-# Carga de variables de entorno
+# Cargar claves desde .env
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Validación de la API Key
-if not api_key:
-    st.error("❌ No se encontró la clave de API de OpenAI. Verifica tu archivo `.env` o los secretos en Streamlit Cloud.")
-    st.stop()
-
-# Cliente de OpenAI
-client = OpenAI(api_key=api_key)
-
-# Configuración de la página
+# Config de la página
 st.set_page_config(page_title="Lead Scoring", layout="wide")
-st.title("🔍 Análisis de Leads con IA")
+st.title("🔍 Lead Scoring App con IA")
 
 # Sidebar
 with st.sidebar:
@@ -31,31 +23,6 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
 
-st.markdown("""
-### 🧠 ¿Qué hace esta app?
-
-Esta herramienta analiza leads (clientes potenciales) utilizando **inteligencia artificial** para predecir su intención de contratar servicios digitales.
-
-Evalúa cada mensaje teniendo en cuenta:
-
-- El contenido del mensaje del cliente
-- El tipo de empresa
-- El tamaño de la empresa
-
----
-
-👥 **Ideal para:**
-
-- 📈 Agencias de marketing digital  
-- 🧑‍💻 Freelancers que ofrecen servicios web o redes sociales  
-- 🏢 Equipos comerciales que gestionan grandes listas de contactos  
-
----
-
-⚡ Pulsa en “**Analizar Leads**” para obtener una puntuación de intención de contratación (Lead Score) del 1 al 5, junto con su categoría: **Frío, Tibio o Caliente**.
-""")
-
-
 # Descarga de ejemplo
 with open("leads.csv", "rb") as file:
     st.download_button("⬇️ Descargar CSV de ejemplo", file, "leads.csv", "text/csv")
@@ -65,7 +32,17 @@ uploaded_file = st.file_uploader("📤 Sube tu archivo CSV de leads", type="csv"
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
+    st.subheader("📄 Vista previa del archivo subido")
     st.dataframe(df, use_container_width=True)
+
+    st.markdown("### ⚙️ Configura tu análisis")
+    col_mensaje = st.selectbox("📝 ¿Qué columna contiene el mensaje o deseo del lead?", df.columns)
+    col_nombre = st.selectbox("👤 ¿Qué columna usar como nombre?", df.columns, index=0)
+    col_email = st.selectbox("📧 ¿Qué columna usar como email?", df.columns, index=1)
+
+    # Columnas por defecto para el análisis
+    df["empresa"] = "Sin datos"
+    df["tamaño_empresa"] = "pequeña"
 
     if st.button("✨ Analizar Leads"):
 
@@ -94,7 +71,7 @@ Solo responde con un número del 1 al 5.
 
         def clasificar_necesidad(mensaje):
             if not isinstance(mensaje, str):
-                return "Otro"  # o también podés poner "Desconocido"
+                return "Otro"
             mensaje = mensaje.lower()
             if "tienda" in mensaje or "ecommerce" in mensaje:
                 return "E-commerce"
@@ -115,8 +92,7 @@ Solo responde con un número del 1 al 5.
             else:
                 return "🔴 Frío"
 
-        # Análisis con spinner
-        with st.spinner("Analizando leads..."):
+        with st.spinner("🤖 Analizando intención de compra..."):
             df["lead_score"] = df.apply(
                 lambda row: obtener_score(row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
                 axis=1
@@ -124,20 +100,13 @@ Solo responde con un número del 1 al 5.
             df["categoría"] = df["lead_score"].apply(categorizar)
             df["necesidad"] = df[col_mensaje].apply(clasificar_necesidad)
 
-
         st.success("✅ Análisis completado")
         st.dataframe(df, use_container_width=True)
 
-        # Exportar resultados
-        with st.spinner("Generando archivos para descargar..."):
-            csv = df.to_csv(index=False).encode('utf-8')
-            st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
+        # Exportar
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
 
-            df.to_excel("leads_analizados.xlsx", index=False)
-            with open("leads_analizados.xlsx", "rb") as f:
-                st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
-
-        st.markdown("""<hr style="border:1px solid #ccc">
-        <center>
-            Hecho con ❤️ por <a href="https://elsaltoweb.es" target="_blank">Andrés Tobío</a> · Powered by OpenAI & Streamlit
-        </center>""", unsafe_allow_html=True)
+        df.to_excel("leads_analizados.xlsx", index=False)
+        with open("leads_analizados.xlsx", "rb") as f:
+            st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
