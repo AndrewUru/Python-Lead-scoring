@@ -9,13 +9,165 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Config de la página
-st.set_page_config(page_title="Lead Scoring", layout="wide")
-st.title("🔍 Lead Scoring App con IA")
+st.set_page_config(page_title="Lead Scoring con IA", page_icon="🧠", layout="wide")
+
+# Ocultar Streamlit y personalizar el header
+hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+st.markdown("""
+<style>
+.navbar {
+    background-color: #0e1117;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.navbar h1 {
+    color: #4FC3F7;
+    margin: 0;
+    font-size: 1.4rem;
+}
+.navbar a {
+    color: white;
+    margin-left: 1rem;
+    text-decoration: none;
+}
+</style>
+
+<div class="navbar">
+    <h1>🔍 Lead Scoring AI</h1>
+    <div>
+        <a href="#ejemplo">Ejemplo</a>
+        <a href="#analisis">Análisis</a>
+        <a href="https://github.com/AndrewUru/Python-Lead-scoring
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+
+
+# Header personalizado moderno
+st.markdown("""
+<div style='background-color:#262730; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; text-align:center;'>
+    <h1 style='color:#4FC3F7; margin-bottom: 0.5rem;'>Evalúa automáticamente la intención de compra de tus leads y clasifícalos como Frío, Tibio o Caliente.</h1>
+</div>
+""", unsafe_allow_html=True)
+
+# Sidebar
+with st.sidebar:
+    st.image("logo.png", width=150)
+    st.title("📊 Lead Scoring App")
+    st.markdown("---")
+    st.markdown("📁 Subir archivo CSV")
+    st.markdown("📥 Descargar ejemplo")
+    st.markdown("📈 Ver resultados")
+    st.markdown("---")
+    st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
+
+    # Descarga de ejemplo
+with open("leads.csv", "rb") as file:
+    st.download_button("⬇️ Descargar CSV de ejemplo", file, "leads.csv", "text/csv")
+
+# Subida de archivo
+uploaded_file = st.file_uploader("📤 Sube tu archivo CSV de leads", type="csv")
+
+if uploaded_file:
+    df = pd.read_csv(uploaded_file)
+    st.subheader("📄 Vista previa del archivo subido")
+    st.dataframe(df, use_container_width=True)
+
+    st.markdown("### ⚙️ Configura tu análisis")
+    col_mensaje = st.selectbox("📝 ¿Qué columna contiene el mensaje o deseo del lead?", df.columns)
+    col_nombre = st.selectbox("👤 ¿Qué columna usar como nombre?", df.columns, index=0)
+    col_email = st.selectbox("📧 ¿Qué columna usar como email?", df.columns, index=1)
+
+    # Columnas por defecto para el análisis
+    df["empresa"] = "Sin datos"
+    df["tamaño_empresa"] = "pequeña"
+
+    if st.button("✨ Analizar Leads"):
+
+        def obtener_score(mensaje, empresa, tamaño_empresa):
+            prompt = f"""
+Eres un asesor experto en marketing digital. Evalúa del 1 al 5 la intención de contratar (1 = baja, 5 = alta):
+
+Lead:
+- Empresa: {empresa}
+- Tamaño: {tamaño_empresa}
+- Mensaje: "{mensaje}"
+
+Solo responde con un número del 1 al 5.
+"""
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0
+                )
+                score = response.choices[0].message.content.strip()
+                return int(score)
+            except Exception as e:
+                st.warning(f"⚠️ Error al analizar: '{mensaje[:40]}...'\n{e}")
+                return None
+
+        def clasificar_necesidad(mensaje):
+            if not isinstance(mensaje, str):
+                return "Otro"
+            mensaje = mensaje.lower()
+            if "tienda" in mensaje or "ecommerce" in mensaje:
+                return "E-commerce"
+            elif "web" in mensaje or "página" in mensaje:
+                return "Sitio Web"
+            elif "instagram" in mensaje or "redes" in mensaje:
+                return "Redes Sociales"
+            else:
+                return "Otro"
+
+        def categorizar(score):
+            if score is None:
+                return "❓"
+            elif score >= 4:
+                return "🟢 Caliente"
+            elif score == 3:
+                return "🟡 Tibio"
+            else:
+                return "🔴 Frío"
+
+        with st.spinner("🤖 Analizando intención de compra..."):
+            df["lead_score"] = df.apply(
+                lambda row: obtener_score(row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
+                axis=1
+            )
+            df["categoría"] = df["lead_score"].apply(categorizar)
+            df["necesidad"] = df[col_mensaje].apply(clasificar_necesidad)
+
+        st.success("✅ Análisis completado")
+        st.dataframe(df, use_container_width=True)
+
+        # Exportar
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
+
+        df.to_excel("leads_analizados.xlsx", index=False)
+        with open("leads_analizados.xlsx", "rb") as f:
+            st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
+
 
 # Markdown con estilo moderno mejorado
 st.markdown("""
 <style>
 .intro-box {
+    background-color: #1E1E1E;
     border-radius: 10px;
     padding: 1.5rem;
     margin-bottom: 2rem;
@@ -31,6 +183,7 @@ st.markdown("""
     padding-left: 1.5rem;
     line-height: 1.6;
 }
+footer {visibility: hidden;}
 </style>
 
 <div class="intro-box">
@@ -60,116 +213,17 @@ Evalúa cada mensaje teniendo en cuenta:
 </div>
 """, unsafe_allow_html=True)
 
-# Sidebar
-with st.sidebar:
-    st.image("logo.png", width=150)
-    st.title("📊 Lead Scoring App")
-    st.markdown("---")
-    st.markdown("📁 Subir archivo CSV")
-    st.markdown("📥 Descargar ejemplo")
-    st.markdown("📈 Ver resultados")
-    st.markdown("---")
-    st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
 
-# Descarga de ejemplo
-with open("leads.csv", "rb") as file:
-    st.download_button("⬇️ Descargar CSV de ejemplo", file, "leads.csv", "text/csv")
-
-# Subida de archivo
-uploaded_file = st.file_uploader("📤 Sube tu archivo CSV de leads", type="csv")
-
-if uploaded_file:
-    df = pd.read_csv(uploaded_file)
-    st.subheader("📄 Vista previa del archivo subido")
-    st.dataframe(df, use_container_width=True)
-
-    st.markdown("### ⚙️ Configura tu análisis")
-    col_mensaje = st.selectbox("📝 ¿Qué columna contiene el mensaje o deseo del lead?", df.columns)
-    col_nombre = st.selectbox("👤 ¿Qué columna usar como nombre?", df.columns, index=0)
-    col_email = st.selectbox("📧 ¿Qué columna usar como email?", df.columns, index=1)
-
-    # Columnas por defecto para el análisis
-    df["empresa"] = "Sin datos"
-    df["tamaño_empresa"] = "pequeña"
-
-    # Función de necesidad con IA (debes definirla antes o importarla)
-    def detectar_necesidad_con_ia(mensaje):
-        prompt = f"""
-Analiza el siguiente mensaje de un lead y responde con una sola palabra o frase corta que describa qué tipo de necesidad o servicio está buscando. Puede ser: "E-commerce", "Sitio Web", "Redes Sociales", "SEO", "Publicidad", "Consultoría", etc.
-
-Mensaje:
-"{mensaje}"
-
-Responde solo con el nombre de la categoría detectada.
-"""
-        try:
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0
-            )
-            return response.choices[0].message.content.strip()
-        except Exception as e:
-            st.warning(f"⚠️ Error detectando necesidad: '{mensaje[:40]}...'")
-            return "Desconocido"
-
-    if st.button("✨ Analizar Leads"):
-
-        def obtener_score(mensaje, empresa, tamaño_empresa):
-            prompt = f"""
-Eres un asesor experto en marketing digital. Evalúa el siguiente lead de forma profesional.
-
-Lead:
-- Empresa: {empresa}
-- Tamaño: {tamaño_empresa}
-- Mensaje: "{mensaje}"
-
-Indica:
-
-1. Probabilidad de contratar (del 1 al 5)
-2. Justificación breve
-
-Responde solo con el número (1-5), seguido de dos puntos y una breve explicación. Ejemplo:
-4: Tiene interés, aunque necesita más información.
-"""
-            try:
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0
-                )
-                respuesta = response.choices[0].message.content.strip()
-                score_str, *justificación = respuesta.split(":", 1)
-                return int(score_str.strip())
-            except Exception as e:
-                st.warning(f"⚠️ Error al analizar: '{mensaje[:40]}...'")
-                return None
-
-        def categorizar(score):
-            if score is None:
-                return "❓"
-            elif score >= 4:
-                return "🟢 Caliente"
-            elif score == 3:
-                return "🟡 Tibio"
-            else:
-                return "🔴 Frío"
-
-        with st.spinner("🤖 Analizando intención de compra..."):
-            df["lead_score"] = df.apply(
-                lambda row: obtener_score(row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
-                axis=1
-            )
-            df["categoría"] = df["lead_score"].apply(categorizar)
-            df["necesidad"] = df[col_mensaje].apply(detectar_necesidad_con_ia)
-
-        st.success("✅ Análisis completado")
-        st.dataframe(df, use_container_width=True)
-
-        # Exportar
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
-
-        df.to_excel("leads_analizados.xlsx", index=False)
-        with open("leads_analizados.xlsx", "rb") as f:
-            st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
+# Footer oculto y personalizado (si lo necesitas visible con branding tuyo)
+st.markdown("""
+<style>
+footer {visibility: visible;}
+footer:after {
+    content: 'Desarrollado con ❤️ por Andrés Tobío · Potenciado con Streamlit y OpenAI';
+    display: block;
+    text-align: center;
+    color: #888;
+    padding: 1rem;
+}
+</style>
+""", unsafe_allow_html=True)
