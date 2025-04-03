@@ -149,7 +149,7 @@ Solo responde con un número del 1 al 5.
                 axis=1
             )
             df["categoría"] = df["lead_score"].apply(categorizar)
-            df["necesidad"] = df[col_mensaje].apply(clasificar_necesidad)
+            df["necesidad"] = df[col_mensaje].apply(detectar_necesidad_con_ia)
 
         st.success("✅ Análisis completado")
         st.dataframe(df, use_container_width=True)
