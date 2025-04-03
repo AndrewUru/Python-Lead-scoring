@@ -56,21 +56,23 @@ Evalúa cada mensaje teniendo en cuenta:
 """)
 
 
-# Descarga de ejemplo
-with open("leads.csv", "rb") as file:
-    st.download_button("⬇️ Descargar CSV de ejemplo", file, "leads.csv", "text/csv")
-
 # Subida de archivo
 uploaded_file = st.file_uploader("📤 Sube tu archivo CSV de leads", type="csv")
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
+    st.subheader("📄 Vista previa del archivo subido")
     st.dataframe(df, use_container_width=True)
 
-    # Validación de columnas necesarias
-    if not all(col in df.columns for col in ["mensaje", "empresa", "tamaño_empresa"]):
-        st.error("❌ El CSV debe tener las columnas: mensaje, empresa y tamaño_empresa.")
-        st.stop()
+    st.markdown("### ⚙️ Configura tu análisis")
+
+    col_mensaje = st.selectbox("📝 ¿Qué columna contiene el mensaje o intención del lead?", df.columns)
+    col_nombre = st.selectbox("👤 ¿Qué columna usar como nombre?", df.columns, index=0)
+    col_email = st.selectbox("📧 ¿Qué columna usar como email?", df.columns, index=1)
+
+    # Generar columnas necesarias por defecto
+    df["empresa"] = "Sin datos"
+    df["tamaño_empresa"] = "pequeña"
 
     if st.button("✨ Analizar Leads"):
 
@@ -118,20 +120,20 @@ Solo responde con un número del 1 al 5.
             else:
                 return "🔴 Frío"
 
-        # Análisis con spinner
-        with st.spinner("Analizando leads..."):
+        # Análisis con IA
+        with st.spinner("🤖 Analizando intención de compra..."):
             df["lead_score"] = df.apply(
-                lambda row: obtener_score(row["mensaje"], row["empresa"], row["tamaño_empresa"]),
+                lambda row: obtener_score(row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
                 axis=1
             )
             df["categoría"] = df["lead_score"].apply(categorizar)
-            df["necesidad"] = df["mensaje"].apply(clasificar_necesidad)
+            df["necesidad"] = df[col_mensaje].apply(clasificar_necesidad)
 
         st.success("✅ Análisis completado")
         st.dataframe(df, use_container_width=True)
 
         # Exportar resultados
-        with st.spinner("Generando archivos para descargar..."):
+        with st.spinner("📦 Preparando archivos para descargar..."):
             csv = df.to_csv(index=False).encode('utf-8')
             st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
 
