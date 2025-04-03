@@ -11,16 +11,6 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # Config de la página
 st.set_page_config(page_title="Lead Scoring con IA", page_icon="🧠", layout="wide")
 
-# Ocultar Streamlit y personalizar el header
-hide_streamlit_style = """
-    <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    </style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
 st.markdown("""
 <style>
 .navbar {
