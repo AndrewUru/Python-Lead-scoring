@@ -31,20 +31,30 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
 
-# Explicación
 st.markdown("""
 ### 🧠 ¿Qué hace esta app?
 
-Esta herramienta analiza leads usando IA para predecir su intención de contratar.
+Esta herramienta analiza leads (clientes potenciales) utilizando **inteligencia artificial** para predecir su intención de contratar servicios digitales.
 
-Ideal para:
+Evalúa cada mensaje teniendo en cuenta:
 
-- Agencias de marketing digital
-- Freelancers web
-- Equipos de ventas
+- El contenido del mensaje del cliente
+- El tipo de empresa
+- El tamaño de la empresa
 
 ---
+
+👥 **Ideal para:**
+
+- 📈 Agencias de marketing digital  
+- 🧑‍💻 Freelancers que ofrecen servicios web o redes sociales  
+- 🏢 Equipos comerciales que gestionan grandes listas de contactos  
+
+---
+
+⚡ Pulsa en “**Analizar Leads**” para obtener una puntuación de intención de contratación (Lead Score) del 1 al 5, junto con su categoría: **Frío, Tibio o Caliente**.
 """)
+
 
 # Descarga de ejemplo
 with open("leads.csv", "rb") as file:
