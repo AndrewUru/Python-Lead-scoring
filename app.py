@@ -16,7 +16,6 @@ st.title("🔍 Lead Scoring App con IA")
 st.markdown("""
 <style>
 .intro-box {
-    background-color: #1E1E1E;
     border-radius: 10px;
     padding: 1.5rem;
     margin-bottom: 2rem;
@@ -72,8 +71,6 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
 
-    
-
 # Descarga de ejemplo
 with open("leads.csv", "rb") as file:
     st.download_button("⬇️ Descargar CSV de ejemplo", file, "leads.csv", "text/csv")
@@ -92,14 +89,35 @@ if uploaded_file:
     col_email = st.selectbox("📧 ¿Qué columna usar como email?", df.columns, index=1)
 
     # Columnas por defecto para el análisis
-df["empresa"] = "Sin datos"
-df["tamaño_empresa"] = "pequeña"
+    df["empresa"] = "Sin datos"
+    df["tamaño_empresa"] = "pequeña"
 
-if st.button("✨ Analizar Leads"):
-
-# Evaluar intención de contratación con IA
-    def obtener_score(mensaje, empresa, tamaño_empresa):
+    # Función de necesidad con IA (debes definirla antes o importarla)
+    def detectar_necesidad_con_ia(mensaje):
         prompt = f"""
+Analiza el siguiente mensaje de un lead y responde con una sola palabra o frase corta que describa qué tipo de necesidad o servicio está buscando. Puede ser: "E-commerce", "Sitio Web", "Redes Sociales", "SEO", "Publicidad", "Consultoría", etc.
+
+Mensaje:
+"{mensaje}"
+
+Responde solo con el nombre de la categoría detectada.
+"""
+        try:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            st.warning(f"⚠️ Error detectando necesidad: '{mensaje[:40]}...'
+{e}")
+            return "Desconocido"
+
+    if st.button("✨ Analizar Leads"):
+
+        def obtener_score(mensaje, empresa, tamaño_empresa):
+            prompt = f"""
 Eres un asesor experto en marketing digital. Evalúa el siguiente lead de forma profesional.
 
 Lead:
@@ -115,47 +133,45 @@ Indica:
 Responde solo con el número (1-5), seguido de dos puntos y una breve explicación. Ejemplo:
 4: Tiene interés, aunque necesita más información.
 """
-        try:
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0
+                )
+                respuesta = response.choices[0].message.content.strip()
+                score_str, *justificación = respuesta.split(":", 1)
+                return int(score_str.strip())
+            except Exception as e:
+                st.warning(f"⚠️ Error al analizar: '{mensaje[:40]}...'
+{e}")
+                return None
+
+        def categorizar(score):
+            if score is None:
+                return "❓"
+            elif score >= 4:
+                return "🟢 Caliente"
+            elif score == 3:
+                return "🟡 Tibio"
+            else:
+                return "🔴 Frío"
+
+        with st.spinner("🤖 Analizando intención de compra..."):
+            df["lead_score"] = df.apply(
+                lambda row: obtener_score(row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
+                axis=1
             )
-            respuesta = response.choices[0].message.content.strip()
-            score_str, *justificación = respuesta.split(":", 1)
-            return int(score_str.strip())
-        except Exception as e:
-            st.warning(f"⚠️ Error al analizar: '{mensaje[:40]}...'\n{e}")
-            return None
+            df["categoría"] = df["lead_score"].apply(categorizar)
+            df["necesidad"] = df[col_mensaje].apply(detectar_necesidad_con_ia)
 
-    # Clasificación de categoría (visual)
-    def categorizar(score):
-        if score is None:
-            return "❓"
-        elif score >= 4:
-            return "🟢 Caliente"
-        elif score == 3:
-            return "🟡 Tibio"
-        else:
-            return "🔴 Frío"
+        st.success("✅ Análisis completado")
+        st.dataframe(df, use_container_width=True)
 
-    with st.spinner("🤖 Analizando intención de compra..."):
-        df["lead_score"] = df.apply(
-            lambda row: obtener_score(row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
-            axis=1
-        )
-        df["categoría"] = df["lead_score"].apply(categorizar)
-        df["necesidad"] = df[col_mensaje].apply(detectar_necesidad_con_ia)
+        # Exportar
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
 
-    st.success("✅ Análisis completado")
-    st.dataframe(df, use_container_width=True)
-
-
-
-# Exportar
-csv = df.to_csv(index=False).encode('utf-8')
-st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
-
-df.to_excel("leads_analizados.xlsx", index=False)
-with open("leads_analizados.xlsx", "rb") as f:
-        st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
+        df.to_excel("leads_analizados.xlsx", index=False)
+        with open("leads_analizados.xlsx", "rb") as f:
+            st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
