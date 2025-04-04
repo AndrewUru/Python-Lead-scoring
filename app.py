@@ -51,7 +51,7 @@ st.markdown("""
 # Header personalizado moderno
 st.markdown("""
 <div style='background-color:#262730; padding: 1rem; border-radius: 10px; margin-bottom: 2rem; text-align:center;'>
-    <h2  style='color:#4FC3F7; font-size: 1rem; margin-bottom: 0.5rem;'>Evalúa automáticamente la intención de compra de tus leads y clasifícalos como Frío, Tibio o Caliente.</h2>
+    <h3  style='color:#4FC3F7; margin-bottom: 0.5rem;'>Evalúa automáticamente la intención de compra de tus leads y clasifícalos como Frío, Tibio o Caliente.</h3>
 </div>
 """, unsafe_allow_html=True)
 
