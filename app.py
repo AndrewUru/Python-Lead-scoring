@@ -9,7 +9,8 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Config de la página
-st.set_page_config(page_title="Lead Scoring con IA", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="Lead Scoring con IA",
+                   page_icon="🧠", layout="wide")
 
 
 # Header personalizado moderno
@@ -30,9 +31,30 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
 
-    # Descarga de ejemplo
+
+st.markdown("""
+### 🧠 ¿Qué hace esta app?
+
+Esta herramienta analiza leads (clientes potenciales) usando inteligencia artificial.  
+Evalúa el nivel de intención de compra de cada lead en base a su mensaje, el tipo de empresa y su tamaño.
+
+Ideal para:
+
+- Agencias de marketing digital.
+- Freelancers que ofrecen servicios web o en redes sociales.
+- Empresas que quieren priorizar contactos.
+
+---
+
+### 📥 Descarga un archivo de ejemplo
+
+Puedes usar este archivo CSV para probar la app rápidamente.
+""")
+
+# Cargar archivo de ejemplo
 with open("leads.csv", "rb") as file:
-    st.download_button("⬇️ Descargar CSV de ejemplo", file, "leads.csv", "text/csv")
+    st.download_button("⬇️ Descargar CSV de ejemplo",
+                       file, "leads.csv", "text/csv")
 
 # Subida de archivo
 uploaded_file = st.file_uploader("📤 Sube tu archivo CSV de leads", type="csv")
@@ -43,9 +65,12 @@ if uploaded_file:
     st.dataframe(df, use_container_width=True)
 
     st.markdown("### ⚙️ Configura tu análisis")
-    col_mensaje = st.selectbox("📝 ¿Qué columna contiene el mensaje o deseo del lead?", df.columns)
-    col_nombre = st.selectbox("👤 ¿Qué columna usar como nombre?", df.columns, index=0)
-    col_email = st.selectbox("📧 ¿Qué columna usar como email?", df.columns, index=1)
+    col_mensaje = st.selectbox(
+        "📝 ¿Qué columna contiene el mensaje o deseo del lead?", df.columns)
+    col_nombre = st.selectbox(
+        "👤 ¿Qué columna usar como nombre?", df.columns, index=0)
+    col_email = st.selectbox(
+        "📧 ¿Qué columna usar como email?", df.columns, index=1)
 
     # Columnas por defecto para el análisis
     df["empresa"] = "Sin datos"
@@ -101,7 +126,8 @@ Solo responde con un número del 1 al 5.
 
         with st.spinner("🤖 Analizando intención de compra..."):
             df["lead_score"] = df.apply(
-                lambda row: obtener_score(row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
+                lambda row: obtener_score(
+                    row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
                 axis=1
             )
             df["categoría"] = df["lead_score"].apply(categorizar)
@@ -112,11 +138,13 @@ Solo responde con un número del 1 al 5.
 
         # Exportar
         csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
+        st.download_button("📥 Descargar CSV", csv,
+                           "leads_analizados.csv", "text/csv")
 
         df.to_excel("leads_analizados.xlsx", index=False)
         with open("leads_analizados.xlsx", "rb") as f:
-            st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
+            st.download_button(
+                "📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
 
 
 # Markdown con estilo moderno mejorado
