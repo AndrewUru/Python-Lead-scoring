@@ -11,46 +11,10 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # Config de la página
 st.set_page_config(page_title="Lead Scoring con IA", page_icon="🧠", layout="wide")
 
-st.markdown("""
-<style>
-.navbar {
-    width: 100vw;
-    margin: 0;
-    background-color: #0e1117;
-    padding: 1rem 2rem;
-    border-bottom: 1px solid #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.navbar h1 {
-    color: #4FC3F7;
-    margin: 0;
-    font-size: 1.4rem;
-}
-.navbar a {
-    color: white;
-    margin-left: 1rem;
-    text-decoration: none;
-}
-</style>
-
-<div class="navbar">
-    <p>🔍 Lead Scoring AI</p>
-    <div>
-        <a href="#ejemplo">Ejemplo</a>
-        <a href="#analisis">Análisis</a>
-        <a href="https://github.com/AndrewUru/Python-Lead-scoring
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-
-
 
 # Header personalizado moderno
 st.markdown("""
-<div style='background-color:#262730; padding: 1rem; border-radius: 10px; margin-bottom: 2rem; text-align:center;'>
+<div style='padding: 1rem; border-radius: 10px; margin-bottom: 2rem; text-align:center;'>
     <h3  style='color:#4FC3F7; margin-bottom: 0.5rem;'>Evalúa automáticamente la intención de compra de tus leads y clasifícalos como Frío, Tibio o Caliente.</h3>
 </div>
 """, unsafe_allow_html=True)
