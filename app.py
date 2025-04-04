@@ -1,12 +1,12 @@
 import streamlit as st
 import pandas as pd
-from openai import OpenAI
+import openai
 import os
 from dotenv import load_dotenv
 
 # Cargar claves desde .env
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = openai
 
 # Config de la página
 st.set_page_config(page_title="Lead Scoring con IA",
@@ -127,7 +127,8 @@ Solo responde con un número del 1 al 5.
         with st.spinner("🤖 Analizando intención de compra..."):
             df["lead_score"] = df.apply(
                 lambda row: obtener_score(
-                    row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
+                    row[col_mensaje], row["empresa"], row["tamaño_empresa"]
+                ),
                 axis=1
             )
             df["categoría"] = df["lead_score"].apply(categorizar)
