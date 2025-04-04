@@ -14,6 +14,8 @@ st.set_page_config(page_title="Lead Scoring con IA", page_icon="🧠", layout="w
 st.markdown("""
 <style>
 .navbar {
+    width: 100vw;
+    margin: 0;
     background-color: #0e1117;
     padding: 1rem 2rem;
     border-bottom: 1px solid #333;
@@ -49,7 +51,7 @@ st.markdown("""
 # Header personalizado moderno
 st.markdown("""
 <div style='background-color:#262730; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; text-align:center;'>
-    <h1 font-size: 1rem; style='color:#4FC3F7; margin-bottom: 0.5rem;'>Evalúa automáticamente la intención de compra de tus leads y clasifícalos como Frío, Tibio o Caliente.</h1>
+    <h2 font-size: 1rem; style='color:#4FC3F7; margin-bottom: 0.5rem;'>Evalúa automáticamente la intención de compra de tus leads y clasifícalos como Frío, Tibio o Caliente.</h2>
 </div>
 """, unsafe_allow_html=True)
 
