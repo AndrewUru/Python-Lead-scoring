@@ -30,9 +30,9 @@ Evalúa el nivel de intención de compra de cada lead en base a su mensaje, el t
 
 Ideal para:
 
-- Agencias de marketing digital
-- Freelancers que ofrecen servicios web o en redes sociales
-- Empresas que quieren priorizar contactos
+- Agencias de marketing digital.
+- Freelancers que ofrecen servicios web o en redes sociales.
+- Empresas que quieren priorizar contactos.
 
 ---
 
@@ -42,7 +42,8 @@ Puedes usar este archivo CSV para probar la app rápidamente.
 """)
 
 with open("leads.csv", "rb") as file:
-    st.download_button("⬇️ Descargar CSV de ejemplo", file, "leads.csv", "text/csv")
+    st.download_button("⬇️ Descargar CSV de ejemplo",
+                       file, "leads.csv", "text/csv")
 
 
 # ... (tu encabezado y barra lateral se mantiene igual)
@@ -102,7 +103,8 @@ Solo responde con un número del 1 al 5.
 
         with st.spinner("Analizando leads..."):
             df["lead_score"] = df.apply(
-                lambda row: obtener_score(row["mensaje"], row["empresa"], row["tamaño_empresa"]),
+                lambda row: obtener_score(
+                    row["mensaje"], row["empresa"], row["tamaño_empresa"]),
                 axis=1
             )
             df["categoría"] = df["lead_score"].apply(categorizar)
@@ -113,11 +115,13 @@ Solo responde con un número del 1 al 5.
 
         # Exportar
         csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
+        st.download_button("📥 Descargar CSV", csv,
+                           "leads_analizados.csv", "text/csv")
 
         df.to_excel("leads_analizados.xlsx", index=False)
         with open("leads_analizados.xlsx", "rb") as f:
-            st.download_button("📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
+            st.download_button(
+                "📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
 
         st.markdown("""
 <hr style="border:1px solid #ccc">
