@@ -31,7 +31,6 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
 
-<< << << < HEAD
 
 st.markdown("""
 ### 🧠 ¿Qué hace esta app?
@@ -52,9 +51,7 @@ Ideal para:
 Puedes usar este archivo CSV para probar la app rápidamente.
 """)
 
-== == == =
-# Descarga de ejemplo
->>>>>> > 37367b394e0815532e2f30c4647db0985de1f3f0
+# Cargar archivo de ejemplo
 with open("leads.csv", "rb") as file:
     st.download_button("⬇️ Descargar CSV de ejemplo",
                        file, "leads.csv", "text/csv")
