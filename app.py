@@ -36,7 +36,7 @@ st.markdown("""
 </style>
 
 <div class="navbar">
-    <h1>🔍 Lead Scoring AI</h1>
+    <p>🔍 Lead Scoring AI</p>
     <div>
         <a href="#ejemplo">Ejemplo</a>
         <a href="#analisis">Análisis</a>
