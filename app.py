@@ -13,10 +13,59 @@ st.set_page_config(page_title="Lead Scoring con IA",
                    page_icon="🧠", layout="wide")
 
 
-# Header personalizado moderno
+# Header moderno y responsive
 st.markdown("""
-<div style='padding: 1rem; border-radius: 10px; margin-bottom: 2rem; text-align:center;'>
-    <h3  style='color:#4FC3F7; margin-bottom: 0.5rem;'>Evalúa automáticamente la intención de compra de tus leads y clasifícalos como Frío, Tibio o Caliente.</h3>
+<style>
+    /* Animación */
+    @keyframes fadeSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .custom-header {
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+        background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+        animation: fadeSlideIn 1s ease-out;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .custom-header:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .custom-header h3 {
+        color: #4FC3F7;
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    @media (max-width: 768px) {
+        .custom-header h3 {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .custom-header h3 {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+
+<div class='custom-header'>
+    <h3>Evalúa automáticamente la intención de compra de tus leads y clasifícalos como Frío, Tibio o Caliente.</h3>
 </div>
 """, unsafe_allow_html=True)
 
