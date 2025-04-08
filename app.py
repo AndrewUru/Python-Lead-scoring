@@ -68,16 +68,75 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Sidebar
+# Sidebar con estilo pro y roadmap
 with st.sidebar:
-    st.image("logo.png", width=150)
-    st.title("📊 Lead Scoring App")
-    st.markdown("---")
-    st.markdown("📁 Subir archivo CSV")
-    st.markdown("📥 Descargar ejemplo")
-    st.markdown("📈 Ver resultados")
-    st.markdown("---")
-    st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
+    st.image("logo.png", width=160)
+    st.markdown(
+        """
+        <style>
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-top: 1rem;
+        }
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+        .sidebar-section ul {
+            padding-left: 1.2rem;
+        }
+        .sidebar-section li {
+            margin-bottom: 0.5rem;
+        }
+        .sidebar-footer {
+            font-size: 0.8rem;
+            color: #999;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        </style>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">📌 Funcionalidades actuales</div>
+            <ul>
+                <li>⬆️ Subida de archivo CSV</li>
+                <li>🤖 Análisis con IA (GPT)</li>
+                <li>📊 Puntuación del 1 al 5</li>
+                <li>⬇️ Exportación a Excel / CSV</li>
+                <li>📋 Tabla de resultados</li>
+                <li>📈 Gráficos de distribución</li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">🌐 Deploys</div>
+            <ul>
+                <li>🖥️ Local</li>
+                <li>☁️ Streamlit Cloud</li>
+                <li>🚧 Vercel (en desarrollo)</li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">🚀 Futuras funcionalidades</div>
+            <ul>
+                <li>📊 Dashboard con filtros</li>
+                <li>🔐 Autenticación de usuarios</li>
+                <li>📲 Integración WhatsApp / Telegram</li>
+                <li>🔔 Alertas por score</li>
+                <li>🧠 Entrenamiento con tus leads</li>
+                <li>👥 Soporte multiusuario</li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            Desarrollado por <a href="https://elsaltoweb.es" target="_blank">Andrés Tobío</a> 🚀
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 # Markdown con estilo moderno mejorado
 st.markdown("""
