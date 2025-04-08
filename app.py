@@ -1,17 +1,104 @@
 import streamlit as st
 import pandas as pd
-import openai
-import os
+from openai import OpenAI
 from dotenv import load_dotenv
+import os
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Cargar claves desde .env
+from scoring_utils import (
+    obtener_score,
+    clasificar_necesidad,
+    categorizar,
+    obtener_recomendacion
+)
+
+# Cargar variables de entorno
 load_dotenv()
-client = openai
+openai_api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=openai_api_key)
 
-# Config de la página
-st.set_page_config(page_title="Lead Scoring con IA",
-                   page_icon="🧠", layout="wide")
+# Título
+st.title("🔍 Lead Scoring con IA")
 
+# Cargar archivo CSV
+archivo = st.file_uploader("📂 Sube un archivo CSV con tus leads", type=["csv"])
+if archivo is not None:
+    df = pd.read_csv(archivo)
+
+    # Configuración de columnas
+    columnas = df.columns.tolist()
+    col_mensaje = st.selectbox("📨 ¿Qué columna contiene el mensaje o deseo del lead?", columnas, key="mensaje")
+    col_nombre = st.selectbox("🙋 ¿Qué columna usar como nombre?", columnas, key="nombre")
+    col_email = st.selectbox("✉️ ¿Qué columna usar como email?", columnas, key="email")
+
+    # Valores por defecto
+    df["empresa"] = df.get("empresa", "Sin datos")
+    df["tamaño_empresa"] = df.get("tamaño_empresa", "pequeña")
+
+    if st.button("✨ Analizar Leads"):
+        with st.spinner("🤖 Analizando intención de compra..."):
+            resultados = df.copy()
+
+            resultados["score"] = resultados.apply(
+                lambda row: obtener_score(client, row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
+                axis=1
+            )
+            resultados["justificación"] = resultados[col_mensaje].apply(lambda msg: "Score generado por IA")
+            resultados["categoría"] = resultados["score"].apply(categorizar)
+            resultados["recomendación"] = resultados["categoría"].apply(obtener_recomendacion)
+
+            # Combinar resultados con DataFrame original
+            df["lead_score"] = resultados["score"]
+            df["justificación"] = resultados["justificación"]
+            df["categoría"] = resultados["categoría"]
+            df["recomendación"] = resultados["recomendación"]
+
+        st.success("✅ Análisis completado")
+        st.dataframe(df, use_container_width=True)
+
+        st.dataframe(df, use_container_width=True)
+
+        # 👇 Mostrar gráficos solo si 'lead_score' ya existe
+        if "lead_score" in df.columns:
+            st.markdown("### 📈 Distribución de Lead Scores")
+            fig1, ax1 = plt.subplots()
+            sns.histplot(df["lead_score"], bins=5, kde=True, ax=ax1)
+            st.pyplot(fig1)
+
+            st.markdown("### 📊 Clasificación por categoría")
+            fig2, ax2 = plt.subplots()
+            df["categoría"].value_counts().plot(kind="bar", ax=ax2)
+            st.pyplot(fig2)
+        else:
+            st.info("⚠️ Aún no se ha generado el análisis. Presiona '✨ Analizar Leads' primero.")
+
+
+        
+
+    # Exportar resultados
+    csv = df.to_csv(index=False).encode('utf-8')
+    st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
+
+st.markdown(
+    """
+    ### 📥 Descarga un archivo de ejemplo
+
+    Puedes usar este archivo CSV para probar la app rápidamente.
+    """,
+    unsafe_allow_html=True
+)
+
+try:
+    with open("leads.csv", "rb") as file:
+        st.download_button(
+            label="⬇️ Descargar CSV de ejemplo",
+            data=file,
+            file_name="leads.csv",
+            mime="text/csv"
+        )
+except FileNotFoundError:
+    st.warning("⚠️ No se encontró el archivo `leads.csv`. Verifica que esté en la raíz del proyecto.")
 
 # Header moderno y responsive
 st.markdown("""
@@ -187,113 +274,7 @@ Evalúa cada mensaje teniendo en cuenta:
 </div>
 """, unsafe_allow_html=True)
 
-
-st.markdown("""
-
-### 📥 Descarga un archivo de ejemplo
-
-Puedes usar este archivo CSV para probar la app rápidamente.
-""")
-
-# Cargar archivo de ejemplo
-with open("leads.csv", "rb") as file:
-    st.download_button("⬇️ Descargar CSV de ejemplo",
-                       file, "leads.csv", "text/csv")
-
-# Subida de archivo
-uploaded_file = st.file_uploader("📤 Sube tu archivo CSV de leads", type="csv")
-
-if uploaded_file:
-    df = pd.read_csv(uploaded_file)
-    st.subheader("📄 Vista previa del archivo subido")
-    st.dataframe(df, use_container_width=True)
-
-    st.markdown("### ⚙️ Configura tu análisis")
-    col_mensaje = st.selectbox(
-        "📝 ¿Qué columna contiene el mensaje o deseo del lead?", df.columns)
-    col_nombre = st.selectbox(
-        "👤 ¿Qué columna usar como nombre?", df.columns, index=0)
-    col_email = st.selectbox(
-        "📧 ¿Qué columna usar como email?", df.columns, index=1)
-
-    # Columnas por defecto para el análisis
-    df["empresa"] = "Sin datos"
-    df["tamaño_empresa"] = "pequeña"
-
-    if st.button("✨ Analizar Leads"):
-
-        def obtener_score(mensaje, empresa, tamaño_empresa):
-            prompt = f"""
-Eres un asesor experto en marketing digital. Evalúa del 1 al 5 la intención de contratar (1 = baja, 5 = alta):
-
-Lead:
-- Empresa: {empresa}
-- Tamaño: {tamaño_empresa}
-- Mensaje: "{mensaje}"
-
-Solo responde con un número del 1 al 5.
-"""
-            try:
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0
-                )
-                score = response.choices[0].message.content.strip()
-                return int(score)
-            except Exception as e:
-                st.warning(f"⚠️ Error al analizar: '{mensaje[:40]}...'\n{e}")
-                return None
-
-        def clasificar_necesidad(mensaje):
-            if not isinstance(mensaje, str):
-                return "Otro"
-            mensaje = mensaje.lower()
-            if "tienda" in mensaje or "ecommerce" in mensaje:
-                return "E-commerce"
-            elif "web" in mensaje or "página" in mensaje:
-                return "Sitio Web"
-            elif "instagram" in mensaje or "redes" in mensaje:
-                return "Redes Sociales"
-            else:
-                return "Otro"
-
-        def categorizar(score):
-            if score is None:
-                return "❓"
-            elif score >= 4:
-                return "🟢 Caliente"
-            elif score == 3:
-                return "🟡 Tibio"
-            else:
-                return "🔴 Frío"
-
-        with st.spinner("🤖 Analizando intención de compra..."):
-            df["lead_score"] = df.apply(
-                lambda row: obtener_score(
-                    row[col_mensaje], row["empresa"], row["tamaño_empresa"]
-                ),
-                axis=1
-            )
-            df["categoría"] = df["lead_score"].apply(categorizar)
-            df["necesidad"] = df[col_mensaje].apply(clasificar_necesidad)
-
-        st.success("✅ Análisis completado")
-        st.dataframe(df, use_container_width=True)
-
-        # Exportar
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Descargar CSV", csv,
-                           "leads_analizados.csv", "text/csv")
-
-        df.to_excel("leads_analizados.xlsx", index=False)
-        with open("leads_analizados.xlsx", "rb") as f:
-            st.download_button(
-                "📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
-
-
-
-st.markdown("---", unsafe_allow_html=True)
+# Footer moderno y responsive
 
 st.markdown(
     """
