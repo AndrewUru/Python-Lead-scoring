@@ -40,12 +40,11 @@ st.markdown("""
     }
 
     .custom-header:hover {
-        transform: scale(1.02);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
     }
 
     .custom-header h3 {
-        color: #4FC3F7;
+        color: #ffffff;
         margin-bottom: 0.5rem;
         font-size: 2rem;
         font-family: 'Segoe UI', sans-serif;
@@ -80,20 +79,57 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Desarrollado por [Andrés Tobío](https://elsaltoweb.es)")
 
+# Markdown con estilo moderno mejorado
+st.markdown("""
+<style>
+.intro-box {
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #333;
+}
+.intro-box h3 {
+    
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin-top: 0;
+}
+.intro-box ul {
+    padding-left: 1.5rem;
+    line-height: 1.6;
+}
+footer {visibility: hidden;}
+</style>
+
+<div class="intro-box">
+<h3>🧠 ¿Qué hace esta app?</h3>
+
+Esta herramienta analiza leads (clientes potenciales) utilizando <strong>inteligencia artificial</strong> para predecir su intención de contratar servicios digitales.
+
+Evalúa cada mensaje teniendo en cuenta:
+<ul>
+  <li>💬 El contenido del mensaje del cliente</li>
+  <li>🏢 El tipo de empresa</li>
+  <li>📊 El tamaño de la empresa</li>
+</ul>
+
+<hr/>
+
+<h3>👥 Ideal para:</h3>
+<ul>
+  <li>📈 Agencias de marketing digital</li>
+  <li>🧑‍💻 Freelancers que ofrecen servicios web o redes sociales</li>
+  <li>🏢 Equipos comerciales que gestionan grandes listas de contactos</li>
+</ul>
+
+<hr/>
+
+⚡ Pulsa en <strong>“Analizar Leads”</strong> para obtener una puntuación de intención de contratación (Lead Score) del 1 al 5, junto con su categoría: <strong>Frío, Tibio o Caliente</strong>.
+</div>
+""", unsafe_allow_html=True)
+
 
 st.markdown("""
-### 🧠 ¿Qué hace esta app?
-
-Esta herramienta analiza leads (clientes potenciales) usando inteligencia artificial.  
-Evalúa el nivel de intención de compra de cada lead en base a su mensaje, el tipo de empresa y su tamaño.
-
-Ideal para:
-
-- Agencias de marketing digital.
-- Freelancers que ofrecen servicios web o en redes sociales.
-- Empresas que quieren priorizar contactos.
-
----
 
 ### 📥 Descarga un archivo de ejemplo
 
@@ -197,67 +233,52 @@ Solo responde con un número del 1 al 5.
                 "📥 Descargar Excel", f, "leads_analizados.xlsx", "application/vnd.ms-excel")
 
 
-# Markdown con estilo moderno mejorado
-st.markdown("""
-<style>
-.intro-box {
-    background-color: #1E1E1E;
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid #333;
-}
-.intro-box h3 {
-    color: #4FC3F7;
-    font-weight: 700;
-    font-size: 1.6rem;
-    margin-top: 0;
-}
-.intro-box ul {
-    padding-left: 1.5rem;
-    line-height: 1.6;
-}
-footer {visibility: hidden;}
-</style>
 
-<div class="intro-box">
-<h3>🧠 ¿Qué hace esta app?</h3>
+st.markdown("---", unsafe_allow_html=True)
 
-Esta herramienta analiza leads (clientes potenciales) utilizando <strong>inteligencia artificial</strong> para predecir su intención de contratar servicios digitales.
+st.markdown(
+    """
+    <style>
+    .custom-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #f9f9f9;
+        color: #666;
+        text-align: center;
+        padding: 1rem;
+        font-size: 0.9rem;
+        border-top: 1px solid #ddd;
+        z-index: 9999;
+    }
 
-Evalúa cada mensaje teniendo en cuenta:
-<ul>
-  <li>💬 El contenido del mensaje del cliente</li>
-  <li>🏢 El tipo de empresa</li>
-  <li>📊 El tamaño de la empresa</li>
-</ul>
+    .custom-footer a {
+        color: #4f46e5;
+        text-decoration: none;
+        font-weight: 600;
+    }
 
-<hr/>
+    .custom-footer a:hover {
+        text-decoration: underline;
+    }
 
-<h3>👥 Ideal para:</h3>
-<ul>
-  <li>📈 Agencias de marketing digital</li>
-  <li>🧑‍💻 Freelancers que ofrecen servicios web o redes sociales</li>
-  <li>🏢 Equipos comerciales que gestionan grandes listas de contactos</li>
-</ul>
+    /* Para dar espacio abajo y que no tape contenido */
+    .block-container {
+        padding-bottom: 100px;
+    }
+    </style>
 
-<hr/>
-
-⚡ Pulsa en <strong>“Analizar Leads”</strong> para obtener una puntuación de intención de contratación (Lead Score) del 1 al 5, junto con su categoría: <strong>Frío, Tibio o Caliente</strong>.
-</div>
-""", unsafe_allow_html=True)
+    <div class="custom-footer">
+        Desarrollado con ❤️ por 
+        <a href="https://www.linkedin.com/in/andrestobio/" target="_blank">Andrés Tobío</a> · Potenciado con 
+        <a href="https://streamlit.io" target="_blank">Streamlit</a> y 
+        <a href="https://openai.com" target="_blank">OpenAI</a><br />
+        <span style="font-size: 0.8rem;">© 2025 · Todos los derechos reservados</span>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 
-# Footer oculto y personalizado (si lo necesitas visible con branding tuyo)
-st.markdown("""
-<style>
-footer {visibility: visible;}
-footer:after {
-    content: 'Desarrollado con ❤️ por Andrés Tobío · Potenciado con Streamlit y OpenAI';
-    display: block;
-    text-align: center;
-    color: #888;
-    padding: 1rem;
-}
-</style>
-""", unsafe_allow_html=True)
+
