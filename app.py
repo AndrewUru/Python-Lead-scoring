@@ -299,7 +299,7 @@ st.markdown(
     """
     <style>
     .custom-footer {
-        position: fixed;
+        position: sticky-bottom;
         bottom: 0;
         left: 0;
         width: 100%;
