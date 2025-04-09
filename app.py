@@ -24,7 +24,7 @@ st.title("🔍 Lead Scoring con IA")
 st.markdown("""
 <div style="padding: 1.2rem; border-left: 6px solid #4f46e5; border-radius: 8px; margin-top: 1.5rem;">
     <h4 style="margin-bottom: 1rem;">¿Primera vez aquí?</h4>
-    <a href="pages/1_como_funciona" target="_self">
+    <a href="pages/como_funciona" target="_self">
         <button style="background-color: #4f46e5; color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer;">
             ℹ️ Ver guía de uso paso a paso
         </button>
@@ -229,7 +229,7 @@ with st.sidebar:
                 <li>👥 Soporte multiusuario</li>
             </ul>
         </div>
-        st.sidebar.page_link("pages/1_Cómo_funciona.py", label="ℹ️ Cómo usar la app")
+        st.sidebar.page_link("pages/como_funciona.py", label="ℹ️ Cómo usar la app")
 
         <div class="sidebar-footer">
             Desarrollado por <a href="https://elsaltoweb.es" target="_blank">Andrés Tobío</a> 🚀
