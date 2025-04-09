@@ -20,6 +20,11 @@ client = OpenAI(api_key=openai_api_key)
 
 # Título
 st.title("🔍 Lead Scoring con IA")
+# Botón destacado
+st.markdown("### ¿Primera vez aquí?")
+if st.button("ℹ️ Ver guía de uso paso a paso"):
+    st.switch_page("1_como_funciona.py")
+
 
 # Cargar archivo CSV
 archivo = st.file_uploader("📂 Sube un archivo CSV con tus leads", type=["csv"])
@@ -216,6 +221,7 @@ with st.sidebar:
                 <li>👥 Soporte multiusuario</li>
             </ul>
         </div>
+        st.sidebar.page_link("pages/1_Cómo_funciona.py", label="ℹ️ Cómo usar la app")
 
         <div class="sidebar-footer">
             Desarrollado por <a href="https://elsaltoweb.es" target="_blank">Andrés Tobío</a> 🚀
