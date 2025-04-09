@@ -21,9 +21,17 @@ client = OpenAI(api_key=openai_api_key)
 # Título
 st.title("🔍 Lead Scoring con IA")
 # Botón destacado
-st.markdown("### ¿Primera vez aquí?")
-if st.button("ℹ️ Ver guía de uso paso a paso"):
-    st.switch_page("1_como_funciona.py")
+st.markdown("""
+<div style="padding: 1.2rem; border-left: 6px solid #4f46e5; border-radius: 8px; margin-top: 1.5rem;">
+    <h4 style="margin-bottom: 1rem;">¿Primera vez aquí?</h4>
+    <a href="pages/1_como_funciona" target="_self">
+        <button style="background-color: #4f46e5; color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 5px; font-size: 1rem; font-weight: bold; cursor: pointer;">
+            ℹ️ Ver guía de uso paso a paso
+        </button>
+    </a>
+</div>
+""", unsafe_allow_html=True)
+
 
 
 # Cargar archivo CSV
@@ -316,7 +324,7 @@ st.markdown(
     </style>
 
     <div class="custom-footer">
-        Desarrollado con ❤️ por 
+        Desarrollado por 
         <a href="https://www.linkedin.com/in/andrestobio/" target="_blank">Andrés Tobío</a> · Potenciado con 
         <a href="https://streamlit.io" target="_blank">Streamlit</a> y 
         <a href="https://openai.com" target="_blank">OpenAI</a><br />
