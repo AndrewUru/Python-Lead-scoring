@@ -24,7 +24,28 @@ st.title("🔍 Lead Scoring con IA")
 # Cargar archivo CSV
 archivo = st.file_uploader("📂 Sube un archivo CSV con tus leads", type=["csv"])
 if archivo is not None:
-    df = pd.read_csv(archivo)
+    df = pd.read_csv(archivo, encoding='utf-8', sep=None, engine='python')
+    st.success("✅ Archivo cargado correctamente")
+
+    # Mostrar DataFrame
+    st.markdown("### 🗂️ Vista previa del archivo")
+    st.dataframe(df.head(), use_container_width=True)
+    st.markdown("---")
+    # Mostrar columnas del DataFrame
+    st.markdown("### 🗂️ Columnas del archivo")  
+    st.write(df.columns.tolist())
+    st.markdown("---")
+    # Mostrar estadísticas del DataFrame 
+    st.markdown("### 📊 Estadísticas del archivo")
+    st.write(df.describe())
+    st.markdown("---")
+    # Mostrar información del DataFrame
+    st.markdown("### ℹ️ Información del archivo")
+    buffer = df.info(buf=None)
+    s = buffer.getvalue()
+    st.text(s)
+    st.markdown("---")
+    # Mostrar tipos de datos del DataFrame  
 
     # Configuración de columnas
     columnas = df.columns.tolist()
@@ -55,9 +76,6 @@ if archivo is not None:
             df["recomendación"] = resultados["recomendación"]
 
         st.success("✅ Análisis completado")
-        st.dataframe(df, use_container_width=True)
-
-        st.dataframe(df, use_container_width=True)
 
         # 👇 Mostrar gráficos solo si 'lead_score' ya existe
         if "lead_score" in df.columns:
