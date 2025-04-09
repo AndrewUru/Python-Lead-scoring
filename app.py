@@ -31,21 +31,9 @@ if archivo is not None:
     st.markdown("### 🗂️ Vista previa del archivo")
     st.dataframe(df.head(), use_container_width=True)
     st.markdown("---")
-    # Mostrar columnas del DataFrame
-    st.markdown("### 🗂️ Columnas del archivo")  
-    st.write(df.columns.tolist())
-    st.markdown("---")
-    # Mostrar estadísticas del DataFrame 
-    st.markdown("### 📊 Estadísticas del archivo")
-    st.write(df.describe())
-    st.markdown("---")
-    # Mostrar información del DataFrame
-    st.markdown("### ℹ️ Información del archivo")
-    buffer = df.info(buf=None)
-    s = buffer.getvalue()
-    st.text(s)
-    st.markdown("---")
-    # Mostrar tipos de datos del DataFrame  
+
+  
+   
 
     # Configuración de columnas
     columnas = df.columns.tolist()
@@ -76,6 +64,14 @@ if archivo is not None:
             df["recomendación"] = resultados["recomendación"]
 
         st.success("✅ Análisis completado")
+
+        
+        # Mostrar tabla de resultados
+        st.markdown("### 🧠 Resultados del análisis")
+        st.dataframe(
+             df[["nombre", "email", col_mensaje, "lead_score", "justificación", "categoría", "recomendación"]],
+             use_container_width=True
+         )
 
         # 👇 Mostrar gráficos solo si 'lead_score' ya existe
         if "lead_score" in df.columns:
