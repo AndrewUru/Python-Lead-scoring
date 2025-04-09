@@ -49,32 +49,58 @@ if archivo is not None:
         with st.spinner("🤖 Analizando intención de compra..."):
             resultados = df.copy()
 
-            resultados["score"] = resultados.apply(
+            resultados["lead_score"] = resultados.apply(
                 lambda row: obtener_score(client, row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
                 axis=1
             )
-            resultados["justificación"] = resultados[col_mensaje].apply(lambda msg: "Score generado por IA")
-            resultados["categoría"] = resultados["score"].apply(categorizar)
+            resultados["justificación"] = "Score generado por IA"
+            resultados["categoría"] = resultados["lead_score"].apply(categorizar)
             resultados["recomendación"] = resultados["categoría"].apply(obtener_recomendacion)
 
-            # Combinar resultados con DataFrame original
-            df["lead_score"] = resultados["score"]
+            # Asignar columnas al DataFrame original
+            df["lead_score"] = resultados["lead_score"]
             df["justificación"] = resultados["justificación"]
             df["categoría"] = resultados["categoría"]
             df["recomendación"] = resultados["recomendación"]
 
-        st.success("✅ Análisis completado")
+            # ✅ Resultados primero
+            st.success("✅ Análisis completado")
+            st.markdown("### 🧠 Resultados del análisis")
+
+    st.dataframe(
+        df[[col_nombre, col_email, col_mensaje, "lead_score", "justificación", "categoría", "recomendación"]],
+        use_container_width=True
+    )
+
+
+    # 📊 Gráficos
+    st.markdown("### 📈 Distribución de Lead Scores")
+    fig1, ax1 = plt.subplots()
+    sns.histplot(df["lead_score"], bins=5, kde=True, ax=ax1)
+    st.pyplot(fig1)
+
+    st.markdown("### 📊 Clasificación por categoría")
+    fig2, ax2 = plt.subplots()
+    df["categoría"].value_counts().plot(kind="bar", ax=ax2)
+    st.pyplot(fig2)
+
 
         
-        # Mostrar tabla de resultados
-        st.markdown("### 🧠 Resultados del análisis")
-        st.dataframe(
-             df[["nombre", "email", col_mensaje, "lead_score", "justificación", "categoría", "recomendación"]],
-             use_container_width=True
-         )
+    # Mostrar tabla de resultados
+    cols_requeridas = {"lead_score", "justificación", "categoría", "recomendación"}
+    if cols_requeridas.issubset(set(df.columns)):
+     st.markdown("### 🧠 Resultados del análisis")
+     st.dataframe(
+        df[[col_nombre, col_email, col_mensaje, "lead_score", "justificación", "categoría", "recomendación"]],
+        use_container_width=True
+    )
+    else:
+     st.warning("⚠️ Aún no se ha realizado el análisis. Presiona '✨ Analizar Leads' primero.")
 
-        # 👇 Mostrar gráficos solo si 'lead_score' ya existe
-        if "lead_score" in df.columns:
+        
+
+    # 👇 Mostrar gráficos solo si 'lead_score' ya existe
+    if "lead_score" in df.columns:
             st.markdown("### 📈 Distribución de Lead Scores")
             fig1, ax1 = plt.subplots()
             sns.histplot(df["lead_score"], bins=5, kde=True, ax=ax1)
@@ -84,7 +110,7 @@ if archivo is not None:
             fig2, ax2 = plt.subplots()
             df["categoría"].value_counts().plot(kind="bar", ax=ax2)
             st.pyplot(fig2)
-        else:
+    else:
             st.info("⚠️ Aún no se ha generado el análisis. Presiona '✨ Analizar Leads' primero.")
 
 
