@@ -12,6 +12,13 @@ from scoring_utils import (
     categorizar,
     obtener_recomendacion
 )
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
 
 # Cargar variables de entorno
 load_dotenv()
@@ -21,34 +28,30 @@ client = OpenAI(api_key=openai_api_key)
 # Título
 st.title("🔍 Lead Scoring con IA")
 
-# Cargar archivo CSV
+# Subir archivo
 archivo = st.file_uploader("📂 Sube un archivo CSV con tus leads", type=["csv"])
+
 if archivo is not None:
     df = pd.read_csv(archivo, encoding='utf-8', sep=None, engine='python')
     st.success("✅ Archivo cargado correctamente")
 
-    # Mostrar DataFrame
     st.markdown("### 🗂️ Vista previa del archivo")
     st.dataframe(df.head(), use_container_width=True)
     st.markdown("---")
 
-  
-   
-
-    # Configuración de columnas
+    # Selección de columnas
     columnas = df.columns.tolist()
     col_mensaje = st.selectbox("📨 ¿Qué columna contiene el mensaje o deseo del lead?", columnas, key="mensaje")
     col_nombre = st.selectbox("🙋 ¿Qué columna usar como nombre?", columnas, key="nombre")
     col_email = st.selectbox("✉️ ¿Qué columna usar como email?", columnas, key="email")
 
-    # Valores por defecto
+    # Valores por defecto si faltan columnas
     df["empresa"] = df.get("empresa", "Sin datos")
     df["tamaño_empresa"] = df.get("tamaño_empresa", "pequeña")
 
     if st.button("✨ Analizar Leads"):
         with st.spinner("🤖 Analizando intención de compra..."):
             resultados = df.copy()
-
             resultados["lead_score"] = resultados.apply(
                 lambda row: obtener_score(client, row[col_mensaje], row["empresa"], row["tamaño_empresa"]),
                 axis=1
@@ -57,68 +60,38 @@ if archivo is not None:
             resultados["categoría"] = resultados["lead_score"].apply(categorizar)
             resultados["recomendación"] = resultados["categoría"].apply(obtener_recomendacion)
 
-            # Asignar columnas al DataFrame original
+            # Añadir columnas al DataFrame original
             df["lead_score"] = resultados["lead_score"]
             df["justificación"] = resultados["justificación"]
             df["categoría"] = resultados["categoría"]
             df["recomendación"] = resultados["recomendación"]
 
-            # ✅ Resultados primero
-            st.success("✅ Análisis completado")
-            st.markdown("### 🧠 Resultados del análisis")
+        st.success("✅ Análisis completado")
 
-    st.dataframe(
-        df[[col_nombre, col_email, col_mensaje, "lead_score", "justificación", "categoría", "recomendación"]],
-        use_container_width=True
-    )
+        # Mostrar resultados
+        st.markdown("### 🧠 Resultados del análisis")
+        st.dataframe(
+            df[[col_nombre, col_email, col_mensaje, "lead_score", "justificación", "categoría", "recomendación"]],
+            use_container_width=True
+        )
 
+        # Mostrar gráficos
+        st.markdown("### 📈 Distribución de Lead Scores")
+        fig1, ax1 = plt.subplots()
+        sns.histplot(df["lead_score"], bins=5, kde=True, ax=ax1)
+        st.pyplot(fig1)
 
-    # 📊 Gráficos
-    st.markdown("### 📈 Distribución de Lead Scores")
-    fig1, ax1 = plt.subplots()
-    sns.histplot(df["lead_score"], bins=5, kde=True, ax=ax1)
-    st.pyplot(fig1)
+        st.markdown("### 📊 Clasificación por categoría")
+        fig2, ax2 = plt.subplots()
+        df["categoría"].value_counts().plot(kind="bar", ax=ax2)
+        st.pyplot(fig2)
 
-    st.markdown("### 📊 Clasificación por categoría")
-    fig2, ax2 = plt.subplots()
-    df["categoría"].value_counts().plot(kind="bar", ax=ax2)
-    st.pyplot(fig2)
-
-
-        
-    # Mostrar tabla de resultados
-    cols_requeridas = {"lead_score", "justificación", "categoría", "recomendación"}
-    if cols_requeridas.issubset(set(df.columns)):
-     st.markdown("### 🧠 Resultados del análisis")
-     st.dataframe(
-        df[[col_nombre, col_email, col_mensaje, "lead_score", "justificación", "categoría", "recomendación"]],
-        use_container_width=True
-    )
+        # Exportar resultados
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
     else:
-     st.warning("⚠️ Aún no se ha realizado el análisis. Presiona '✨ Analizar Leads' primero.")
+        st.info("⚠️ Aún no se ha realizado el análisis. Presiona '✨ Analizar Leads' para ver resultados.")
 
-        
-
-    # 👇 Mostrar gráficos solo si 'lead_score' ya existe
-    if "lead_score" in df.columns:
-            st.markdown("### 📈 Distribución de Lead Scores")
-            fig1, ax1 = plt.subplots()
-            sns.histplot(df["lead_score"], bins=5, kde=True, ax=ax1)
-            st.pyplot(fig1)
-
-            st.markdown("### 📊 Clasificación por categoría")
-            fig2, ax2 = plt.subplots()
-            df["categoría"].value_counts().plot(kind="bar", ax=ax2)
-            st.pyplot(fig2)
-    else:
-            st.info("⚠️ Aún no se ha generado el análisis. Presiona '✨ Analizar Leads' primero.")
-
-
-        
-
-    # Exportar resultados
-    csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button("📥 Descargar CSV", csv, "leads_analizados.csv", "text/csv")
 
 st.markdown(
     """
