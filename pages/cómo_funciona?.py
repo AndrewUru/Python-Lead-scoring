@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="Cómo funciona", page_icon="🧭")
+st.set_page_config(page_title="Cómo funciona?", page_icon="🧭")
 
 st.title("🧭 Cómo usar la app Lead Scoring con IA")
 st.markdown("---")

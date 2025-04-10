@@ -229,9 +229,7 @@ with st.sidebar:
                 <li>👥 Soporte multiusuario</li>
             </ul>
         </div>
-        <div class="sidebar-section">
-        st.sidebar.page_link("pages/como_funciona.py", label="ℹ️ Cómo usar la app")
-        </div>
+
         
 
         <div class="sidebar-footer">
